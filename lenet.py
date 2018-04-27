@@ -73,7 +73,7 @@ def fc_m(filename, in_n, out_n):
 
     for i in list(fc):
         out[i[0],i[1]] = 1
-    out = tf.constant(out, dtype=float32)
+    out = tf.constant(out, dtype=tf.float32)
     return out
 
 def conv_2d(x, w, m):
@@ -152,7 +152,7 @@ def LeNet(x):
     conv1_b = tf.Variable(tf.zeros(6))
     
     m = conv_m('lenet_conv1_b10.mtx', 32, 32, 1, 28, 28, 6, 5)
-    conv = conv_2d(images, kernel, m)
+    conv1 = conv_2d(x, conv1_w, m) + conv1_b
     
     #conv1 = tf.nn.conv2d(x,conv1_w, strides = [1,1,1,1], padding = 'VALID') + conv1_b 
     # TODO: Activation.
@@ -166,7 +166,7 @@ def LeNet(x):
     conv2_w = tf.Variable(tf.truncated_normal(shape = [5,5,6,16], mean = mu, stddev = sigma))
     conv2_b = tf.Variable(tf.zeros(16))
     m = conv_m('lenet_conv2_b10.mtx', 14, 14, 6, 10, 10, 16, 5)
-    conv = conv_2d(norm1, kernel, m)
+    conv2 = conv_2d(pool_1, conv2_w, m) + conv2_b
     #     conv2 = tf.nn.conv2d(pool_1, conv2_w, strides = [1,1,1,1], padding = 'VALID') + conv2_b
     # TODO: Activation.
     conv2 = tf.nn.relu(conv2)
@@ -190,7 +190,7 @@ def LeNet(x):
 
     # TODO: Layer 4: Fully Connected. Input = 120. Output = 84.
     fc2_w = tf.Variable(tf.truncated_normal(shape = (120,84), mean = mu, stddev = sigma))
-    fc1_m = fc_m('lenet_fc2_b10.mtx', 120,84)
+    fc2_m = fc_m('lenet_fc2_b10.mtx', 120,84)
     fc2_w = tf.multiply(fc2_w, fc2_m)
     fc2_b = tf.Variable(tf.zeros(84))
     fc2 = tf.matmul(fc1,fc2_w) + fc2_b
@@ -199,7 +199,7 @@ def LeNet(x):
     
     # TODO: Layer 5: Fully Connected. Input = 84. Output = 10.
     fc3_w = tf.Variable(tf.truncated_normal(shape = (84,10), mean = mu , stddev = sigma))
-    fc1_m = fc_m('lenet_fc3_b10.mtx', 84,10)
+    fc3_m = fc_m('lenet_fc3_b10.mtx', 84,10)
     fc3_w = tf.multiply(fc3_w, fc3_m)
     fc3_b = tf.Variable(tf.zeros(10))
     logits = tf.matmul(fc2, fc3_w) + fc3_b
